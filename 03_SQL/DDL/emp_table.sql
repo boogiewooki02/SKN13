@@ -1,3 +1,7 @@
+-- create database hr;
+use hr;
+
+
 DROP TABLE IF EXISTS emp;
 CREATE TABLE emp(
     emp_id 		INT PRIMARY KEY,
@@ -5,7 +9,7 @@ CREATE TABLE emp(
     job 		VARCHAR(35) NOT NULL,
     mgr_id 		INT,
     hire_date 	DATE NOT NULL,
-    salary 		DECIMAL(7,2),    
+    salary 		DECIMAL(7,2),
     comm_pct 	DECIMAL(2,2),
     dept_name 	VARCHAR(30)
 );
