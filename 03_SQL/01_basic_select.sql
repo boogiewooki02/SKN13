@@ -245,16 +245,29 @@ order by salary asc, emp_id desc
 ******************************************************************* */
 
 --  직원들의 전체 정보를 직원 ID(emp_id)가 큰 순서대로 정렬해 조회
-
+select * from emp
+order by emp_id desc;
 
 --  직원들의 id(emp_id), 이름(emp_name), 업무(job), 급여(salary)를 
 --  업무(job) 순서대로 (A -> Z) 조회하고 업무(job)가 같은 직원들은 급여(salary)가 높은 순서대로 2차 정렬해서 조회.
-
+select emp_id,
+	emp_name,
+	job, -- 3
+    salary -- 4
+from emp
+-- order by job, salary desc;
+order by 3 asc, 4 desc; -- select 절에 있는 순서로도 사용 가능
 
 -- 부서명을 부서명(dept_name)의 오름차순으로 정렬해 조회하시오.
-
+select dept_name from emp
+order by dept_name; -- 참고) 오름차순으로 정렬하면 null인 값은 제일 앞쪽에 배치됨
 
 -- 급여(salary)가 $5,000을 넘는 직원의 ID(emp_id), 이름(emp_name), 급여(salary)를 급여가 높은 순서부터 조회
-
+select emp_id,
+	emp_name,
+    salary
+from emp
+where salary >= 5000
+order by salary desc;
 
 
