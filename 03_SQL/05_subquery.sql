@@ -23,37 +23,80 @@
 - 서브쿼리는 반드시 ( ) 로 묶어줘야 한다.
 ************************************************************************** */
 -- 직원_ID(emp.emp_id)가 120번인 직원과 같은 업무(emp.job_id)를 하는 직원의 id(emp_id),이름(emp.emp_name), 업무(emp.job_id), 급여(emp.salary) 조회
-
+select emp_id, emp_name, job_id, salary
+from emp
+where job_id = (
+	select job_id
+    from emp
+    where emp_id = 120
+);
 
 -- 직원_id(emp.emp_id)가 115번인 직원과 같은 업무(emp.job_id)를 하고 같은 부서(emp.dept_id)에 속한 직원들을 조회하시오.
+select * from emp
+where (job_id, dept_id) = (select job_id, dept_id from emp where emp_id = 115);
 
+-- select * from emp where (job_id, dept_id) = ('PU_MAN', 30);
+	-- mysql은 지원하지만 안되는 dbms도 있다.
 
 
 -- 직원의 ID(emp.emp_id)가 150인 직원과 업무(emp.job_id)와 상사(emp.mgr_id)가 같은 직원들의 
 -- id(emp.emp_id), 이름(emp.emp_name), 업무(emp.job_id), 상사(emp.mgr_id) 를 조회
-
+select emp_id, emp_name, job_id
+from emp
+where (job_id, mgr_id) = (select job_id, mgr_id from emp where emp_id = 150);
 
 
 -- 직원들 중 급여(emp.salary)가 전체 직원의 평균 급여보다 적은 직원들의 id(emp.emp_id), 이름(emp.emp_name), 급여(emp.salary)를 조회. 
-
+select emp_id, emp_name, salary
+from emp
+where salary < (select avg(salary) from emp); -- 평균은 6517.906542
 
 
 -- 부서직원들의 평균이 전체 직원의 평균(emp.salary) 이상인 부서의 이름(dept.dept_name), 평균 급여(emp.salary) 조회.
 -- 평균급여는 소숫점 2자리까지 나오고 통화표시($)와 단위 구분자 출력
+select d.dept_id, d.dept_name, 
+	 round(avg(e.salary), 2) as "평균급여"
+from dept d join emp e on d.dept_id = e.dept_id
+group by d.dept_id, d.dept_name
+having avg(salary) >= (select avg(salary) from emp)
+order by 3;
 
+select dept_id, dept_name, concat('$', round(평균급여, 2)) as "평균급여"
+	from ( select d.dept_id, d.dept_name, avg(e.salary) as "평균급여"
+			from dept d join emp e on d.dept_id = e.dept_id
+			group by d.dept_id, d.dept_name
+			having avg(salary) >= (select avg(salary) from emp)
+			order by 3) as t;
+
+select d.dept_id, d.dept_name, 
+	concat('$', round(avg(e.salary), 2)) as "평균급여"
+from dept d join emp e on d.dept_id = e.dept_id
+group by d.dept_id, d.dept_name
+having avg(salary) >= (select avg(salary) from emp)
+order by 3;
 
 
 --  급여(emp.salary)가장 많이 받는 직원이 속한 부서의 이름(dept.dept_name), 위치(dept.loc)를 조회.
-
+select dept_name, loc
+from dept
+where dept_id = (select dept_id from emp where salary = (select max(salary) from emp));
 
 
 -- Sales 부서(dept.dept_name) 의 평균 급여(emp.salary)보다 급여가 많은 직원들의 모든 정보를 조회.
-
+select * from emp
+where salary > (
+	select avg(salary)
+	from dept d join emp e on d.dept_id = e.dept_id
+	where d.dept_name = 'Sales')
+order by salary asc;
 
 
 -- 전체 직원들 중 담당 업무 ID(emp.job_id) 가 'ST_CLERK'인 직원들의 평균 급여보다 적은 급여를 받는 직원들의 모든 정보를 조회. 
 -- 단 업무 ID가 'ST_CLERK'이 아닌 직원들만 조회. 
-
+select * from emp
+where salary < (select avg(salary) from emp where job_id = 'ST_CLERK')
+	and (job_id <> 'ST_CLERK' or job_id is null);
+-- job_id is null을 안하면 job_id가 null인 행들이 조회가 안됨. null은 =, <> 모두 false
 
 
 -- 업무(emp.job_id)가 'IT_PROG' 인 직원들 중 가장 많은 급여를 받는 직원보다 더 많은 급여를 받는 직원들의 id(emp.emp_id), 이름(emp.emp_name), 급여(emp.salary)를 급여 내림차순으로 조회.
@@ -69,7 +112,14 @@
 	- 비교연산자 all : 조회된 값들 모두와 참이면 참 (where 컬럼 > all(서브쿼리) )
 ------------------------------------------------*/
 -- 'Alexander' 란 이름(emp.emp_name)을 가진 관리자(emp.mgr_id)의 부하 직원들의 ID(emp_id), 이름(emp_name), 업무(job_id), 입사년도(hire_date-년도만출력), 급여(salary)를 조회
+select emp_id, emp_name, salary
+from emp
+where salary > (select max(salary) from emp where job_id = 'IT_PROG')
+order by 3 desc;
 
+select emp_id, emp_name, job_id, year(hire_date) as "입사년도", salary
+from emp
+where mgr_id in (select emp_id from emp where emp_name = 'Alexander');
 
 --  부서 위치(dept.loc) 가 'New York'인 부서에 소속된 직원의 ID(emp.emp_id), 이름(emp.emp_name), 부서_id(emp.dept_id) 를 sub query를 이용해 조회.
 
@@ -93,7 +143,15 @@
 - 서브쿼리 결과를 테이블처럼 사용할 수 있다.
 * *************************************************************************************************/
 
--- 중복된 데이터 조회 
+-- 중복된 데이터 조회 (emp에서 여러번 나오는 이름을 조회)
+select emp_name, cnt
+from (
+	select emp_name, count(*) as "cnt"
+    from emp
+    group by emp_name
+    order by cnt
+) t
+where cnt >= 2;
 
 
 /* *************************************************************************************************
@@ -118,9 +176,15 @@ EXISTS, NOT EXISTS 연산자 (상관쿼리와 같이 사용된다)
  
 
 -- 직원이 한명이상 있는 부서의 부서ID(dept.dept_id)와 이름(dept.dept_name), 위치(dept.loc)를 조회
+select d.dept_id, d.dept_name, d.loc
+from dept d
+where exists (select * from emp e where e.dept_id = d.dept_id);
 
+-- subquery에서 main query의 table을 사용하도록 정의하면 상관 
 
 -- 직원이 한명도 없는 부서의 부서ID(dept.dept_id)와 이름(dept.dept_name), 위치(dept.loc)를 조회
-
+select d.dept_id, d.dept_name, d.loc
+from dept d
+where not exists (select * from emp e where e.dept_id = d.dept_id);
 
 
