@@ -85,7 +85,7 @@ st.subheader("파일 업로드 버튼")
 col4, col5 = st.columns(2)
 
 uploaded_file = col4.file_uploader(
-    "이미지 업로드", 
+    "이미지 업로드",
     type=["png", "jpg"],           # 업로드 파일 확장자 제한. (생략하면 모든 확장자의 파일을 다 업로드 할 수있다.)
     accept_multiple_files=False    # True 설정 시 한번에 여러개 파일 업로드 가능. (False: Default)
 )

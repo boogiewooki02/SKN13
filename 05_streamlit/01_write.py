@@ -22,7 +22,7 @@ import streamlit as st
 """
 
 
-
+"👍🙌"
 
 
 # 타이틀 입력
