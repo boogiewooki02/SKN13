@@ -174,3 +174,42 @@ cython_debug/
 .pypirc
 
 api_key.json
+
+# Large files or folders (custom additions)
+# 모델 파일
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+*.joblib
+*.sav
+*.tflite
+*.pkl
+*.pickle
+
+# 데이터 파일
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.xlsx
+*.xls
+*.jsonl
+*.zip
+*.tar
+*.gz
+*.bz2
+*.7z
+
+# 이미지, 오디오, 비디오 등
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.mp4
+*.mov
+*.avi
+*.mp3
+*.wav
