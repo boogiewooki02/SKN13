@@ -47,29 +47,24 @@
 #   - https://docs.streamlit.io/develop/api-reference/caching-and-state/st.session_state
 ##################################################################
 import streamlit as st
-# import random
-
-# idx = random.randint(0, 9)
-# chatbot_message_list = ["오늘 날씨가 어떤가요?",
-# "점심으로 뭘 먹으면 좋을까요?",
-# "집에서 할 수 있는 간단한 운동은 뭐가 있나요?",
-# "요즘 인기 있는 드라마 추천해 줄 수 있나요?",
-# "효과적으로 공부하려면 어떻게 해야 하나요?",
-# "주말에 어디로 놀러 가면 좋을까요?",
-# "잠이 안 올 때는 어떻게 하면 좋을까요?",
-# "효율적으로 정리정돈을 하려면 뭐부터 해야 하나요?",
-# "건강에 좋은 간식으로는 어떤 게 있나요?",
-# "스트레스를 푸는 좋은 방법이 있을까요?"]
-
-# ai_message = chatbot_message_list[idx] # 응답 데이터
-
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 
 # 프롬프트 -> LLM 요청 -> 응답 -> chat_message container에 출력
+
+# LLM 모델 생성
+@st.cache_resource
+def get_llm_model():
+    load_dotenv()
+    return ChatOpenAI(model='gpt-4o-mini')
+
+model = get_llm_model()
+
 
 st.title("Chatbot+session state 위젯 튜토리얼")
 
 # Session State를 생성
-## session_state: dictionary 구현체. 시작 ~ 종료할 때 까지 사용자별로 유지되야 하는 값들을 저장하는 곳
+## session_state: dictionary 구현체. 시작 ~ 종료할 때까지 사용자별로 유지되야 하는 값들을 저장하는 곳
 
 # 0. 대화 내역을 session_state의 "messages":list로 저장
 # 1. session state에 "messages" key가 있는지 조회
@@ -85,6 +80,8 @@ prompt = st.chat_input("User Prompt") # 사용자가 입력한 문자열을 반�
 if prompt is not None:
     # session_state의 messages에 대화 내역을 저장
     st.session_state["messages"].append({"role": "user", "content": prompt})
+
+    ai_message = model.invoke(prompt).content
     st.session_state["messages"].append({"role": "ai", "content": ai_message})
 
 # 대화내역을 chat_message container에 출력
