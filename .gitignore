@@ -216,3 +216,4 @@ api_key.json
 # *.wav
 
 api_key.json
+vector_store/
