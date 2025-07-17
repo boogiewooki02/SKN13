@@ -79,11 +79,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import pymysql
+pymysql.install_as_MySQLdb()  # MySQLdb를 pymysql로 대체
+
 DATABASES = {
-    'default': {
+    'sqlite3': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mypoll', # 데이터베이스 이름
+        'USER': 'playdata', # MySQL 계정 이름
+        'PASSWORD': '1111', # MySQL 계정 비밀번호
+        'HOST': '127.0.0.1', # MySQL 서버 주소
+        'PORT': '3306', # MySQL 서버 포트
+    },
 }
 
 
